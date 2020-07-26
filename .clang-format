@@ -60,3 +60,5 @@ Standard: Cpp11
 TabWidth: '4'
 UseTab: Never
 UseCRLF: false
+
+ColumnLimit: 100

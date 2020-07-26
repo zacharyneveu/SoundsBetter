@@ -2,20 +2,19 @@
 
 #include <JuceHeader.h>
 
-void checkForUpdate();
-
-class AppConfig : public juce::URL::DownloadTask::Listener
+class AppConfig
 {
 private:
     AppConfig();
 
     juce::File app_data_dir;
-	juce::File hpcf_dir;
-    bool dl_complete;
-    double dl_progress;
+    juce::File hpcf_dir;
+
+    juce::String hpcf_url;
 
 public:
-    static const AppConfig& Instance() {
+    static const AppConfig& Instance()
+    {
         static AppConfig conf;
         return conf;
     }
@@ -26,9 +25,6 @@ public:
     AppConfig& operator= (AppConfig&&) = delete;
 
     const juce::File& getAppDataDir() const { return app_data_dir; }
-    const juce::File downloadHPCF(std::string file_name) const;
-    
-    void finished(juce::URL::DownloadTask* task, bool success) override;
-    void progress(juce::URL::DownloadTask* task, int64_t downloaded, int64_t totalLength) override;
-
+    const juce::File& getHPCFDir() const { return hpcf_dir; }
+    const juce::String getHPCFURL() const { return hpcf_url; }
 };

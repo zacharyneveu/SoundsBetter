@@ -29,6 +29,9 @@ private:
     //==============================================================================
     // Your private member variables go here...
     HeadphoneConv hpcf;
+    juce::dsp::Convolution conv;
+
+    AudioDeviceSelectorComponent dev_selector;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

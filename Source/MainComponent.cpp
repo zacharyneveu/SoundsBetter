@@ -1,26 +1,35 @@
 #include "MainComponent.h"
 
+using namespace juce;
+using namespace dsp;
+
 //==============================================================================
-MainComponent::MainComponent()
+MainComponent::MainComponent() : dev_selector (deviceManager, 1, 2, 2, 2, false, false, false, true)
 {
     // Make sure you set the size of the component after
     // you add any child components.
     setSize (800, 600);
     SBLookAndFeel* lf = new SBLookAndFeel;
-    setLookAndFeel(lf);
-    
-    addAndMakeVisible(hpcf);
-    
-    if(juce::RuntimePermissions::isRequired(juce::RuntimePermissions::writeExternalStorage) && !juce::RuntimePermissions::isGranted(juce::RuntimePermissions::writeExternalStorage)) {
-        juce::RuntimePermissions::request(juce::RuntimePermissions::writeExternalStorage, [&](bool granted){});
+    setLookAndFeel (lf);
+
+    addAndMakeVisible (hpcf);
+
+    addAndMakeVisible (dev_selector);
+
+    if (juce::RuntimePermissions::isRequired (juce::RuntimePermissions::writeExternalStorage)
+        && ! juce::RuntimePermissions::isGranted (juce::RuntimePermissions::writeExternalStorage))
+    {
+        juce::RuntimePermissions::request (juce::RuntimePermissions::writeExternalStorage,
+                                           [&] (bool granted) {});
     }
 
     // Some platforms require permissions to open input channels so request that here
     if (juce::RuntimePermissions::isRequired (juce::RuntimePermissions::recordAudio)
         && ! juce::RuntimePermissions::isGranted (juce::RuntimePermissions::recordAudio))
     {
-        juce::RuntimePermissions::request (juce::RuntimePermissions::recordAudio,
-                                           [&] (bool granted) { setAudioChannels (granted ? 2 : 0, 2); });
+        juce::RuntimePermissions::request (
+            juce::RuntimePermissions::recordAudio,
+            [&] (bool granted) { setAudioChannels (granted ? 2 : 0, 2); });
     }
     else
     {
@@ -45,41 +54,69 @@ void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRat
     // but be careful - it will be called on the audio thread, not the GUI thread.
 
     // For more details, see the help for AudioProcessor::prepareToPlay()
+    File f = hpcf.getHPCF();
+    if (f.existsAsFile())
+    {
+        try
+        {
+            int size = 0;
+            conv.loadImpulseResponse (hpcf.getHPCF(),
+                                      Convolution::Stereo::no,
+                                      Convolution::Trim::no,
+                                      size,
+                                      Convolution::Normalise::yes);
+            ProcessSpec spec;
+            spec.maximumBlockSize = samplesPerBlockExpected;
+            spec.numChannels = 2;
+            spec.sampleRate = sampleRate;
+
+            conv.prepare (spec);
+        }
+        catch (...)
+        {
+            DBG ("Problems loading " + hpcf.getHPCF().getFullPathName());
+        }
+    }
 }
 
-void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill)
-{
-    // Your audio-processing code goes here!
+    void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill)
+    {
+        // Your audio-processing code goes here!
 
-    // For more details, see the help for AudioProcessor::getNextAudioBlock()
+        // For more details, see the help for AudioProcessor::getNextAudioBlock()
 
-    // Right now we are not producing any data, in which case we need to clear the buffer
-    // (to prevent the output of random noise)
-    bufferToFill.clearActiveBufferRegion();
-}
+        // Right now we are not producing any data, in which case we need to clear the buffer
+        // (to prevent the output of random noise)
+        AudioBlock<float> block (*bufferToFill.buffer);
+        bufferToFill.clearActiveBufferRegion();
+        ProcessContextReplacing<float> ctxt (block);
+        conv.process (ctxt);
+    }
 
-void MainComponent::releaseResources()
-{
-    // This will be called when the audio device stops, or when it is being
-    // restarted due to a setting change.
+    void MainComponent::releaseResources()
+    {
+        // This will be called when the audio device stops, or when it is being
+        // restarted due to a setting change.
 
-    // For more details, see the help for AudioProcessor::releaseResources()
-}
+        // For more details, see the help for AudioProcessor::releaseResources()
+    }
 
-//==============================================================================
-void MainComponent::paint (juce::Graphics& g)
-{
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    //==============================================================================
+    void MainComponent::paint (juce::Graphics & g)
+    {
+        // (Our component is opaque, so we must completely fill the background with a solid colour)
+        g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 
-    // You can add your drawing code here!
-}
+        // You can add your drawing code here!
+    }
 
-void MainComponent::resized()
-{
-    // This is called when the MainContentComponent is resized.
-    // If you add any child components, this is where you should
-    // update their positions.
-    Rectangle<int> bounds = getBounds();
-    hpcf.setBounds(bounds.removeFromTop(200));
-}
+    void MainComponent::resized()
+    {
+        // This is called when the MainContentComponent is resized.
+        // If you add any child components, this is where you should
+        // update their positions.
+        Rectangle<int> bounds = getBounds();
+        hpcf.setBounds (bounds.removeFromTop (200));
+
+        dev_selector.setBounds (bounds.removeFromTop (200));
+    }
