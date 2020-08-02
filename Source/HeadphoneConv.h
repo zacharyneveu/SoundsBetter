@@ -19,15 +19,14 @@ using namespace juce;
 */
 class HeadphoneConv : public Component,
                       public ComboBox::Listener,
-                      public URL::DownloadTask::Listener
+                      public URL::DownloadTask::Listener,
+                      public ChangeListener
 {
 public:
     HeadphoneConv();
     ~HeadphoneConv() override;
 
-    /**
-     * @brief Gets headphone models from database and stores them in map
-     */
+    /** @brief Gets headphone models from database and stores them in map */
     void populateHeadphoneModels();
     /** @brief Gets list of headphone names from map */
     StringArray getHeadphoneNames();
@@ -41,6 +40,8 @@ public:
     void finished(juce::URL::DownloadTask* task, bool success) override;
     void progress(juce::URL::DownloadTask* task, int64_t downloaded, int64_t totalLength) override;
     File getHPCF() { return ir_file; };
+    
+    void changeListenerCallback(ChangeBroadcaster* source) override;
 
 private:
     double dl_progress;
@@ -49,6 +50,11 @@ private:
     dsp::Convolution conv;
     std::map<String, String> hp_names;
     ComboBox selector;
+
+    AudioThumbnail waveform;
+    AudioThumbnailCache waveform_cache;
+    AudioFormatManager waveform_fmt_mgr;
+    Rectangle<int> waveform_bounds;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (HeadphoneConv)
 };

@@ -30,7 +30,7 @@ ConstructorInitializerAllOnOneLineOrOnePerLine: 'true'
 ConstructorInitializerIndentWidth: '4'
 ContinuationIndentWidth: '4'
 Cpp11BracedListStyle: 'false'
-DeriveLineEnding: false
+#DeriveLineEnding: false
 DerivePointerAlignment: 'false'
 DisableFormat: 'false'
 ExperimentalAutoDetectBinPacking: 'false'
@@ -45,10 +45,10 @@ PointerAlignment: Left
 ReflowComments: 'false'
 SortIncludes: 'true'
 SpaceAfterCStyleCast: 'true'
-SpaceAfterLogicalNot: 'true'
+#SpaceAfterLogicalNot: 'true'
 SpaceBeforeAssignmentOperators: 'true'
 #SpaceBeforeCpp11BracedList: NonEmpty
-SpaceBeforeParens: NonEmptyParentheses
+#SpaceBeforeParens: NonEmptyParentheses
 SpaceInEmptyParentheses: 'false'
 #SpacesBeforeInheritanceColon: 2
 SpacesInAngles: 'false'
@@ -59,6 +59,5 @@ SpacesInSquareBrackets: 'false'
 Standard: Cpp11
 TabWidth: '4'
 UseTab: Never
-UseCRLF: false
-
+#UseCRLF: false
 ColumnLimit: 100
