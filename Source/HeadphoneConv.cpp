@@ -75,12 +75,6 @@ void HeadphoneConv::populateHeadphoneModels()
         hp_names[model] = model+".wav";
         DBG("Loaded HPCF: "+model);
     }
-    /*
-    hp_names["None"] = "Other/None.wav";
-    hp_names["HiFiMan"] = "HiFiMAN/HpCF_Massdrop_HiFiMAN_HE4XX.wav";
-    hp_names["Bose"] = "Bose/HpCF_Bose_Noise_Cancelling_Headphones-700.wav";
-    hp_names["Sennheiser"] = "Sennheiser/HpCF_Sennheiser_HD800S_A.wav";
-     */
 }
 
 StringArray HeadphoneConv::getHeadphoneNames()
@@ -125,6 +119,11 @@ File HeadphoneConv::downloadHPCF(std::string file_name)
         Logger::outputDebugString("Saving to: " + hpcf.getFullPathName());
         
         win.runModalLoop();
+        while(!dl_task->isFinished())
+        {
+            Thread::sleep(10);
+            DBG("sleeping");
+        }
     }
     return hpcf;
 }
@@ -137,7 +136,6 @@ void HeadphoneConv::finished(URL::DownloadTask* task, bool success)
     else
     {
         Logger::outputDebugString("Download Complete!");
-        waveform.setSource(new FileInputSource(ir_file));
     }
 }
 
