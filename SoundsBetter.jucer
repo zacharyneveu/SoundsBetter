@@ -5,16 +5,23 @@
               jucerFormatVersion="1">
   <MAINGROUP id="MyuxZc" name="SoundsBetter">
     <GROUP id="{781A1837-B64C-4436-013D-53165BA85D7F}" name="Source">
+      <GROUP id="{C4D019EF-D5C4-C914-A7C4-10E300E70E41}" name="External">
+        <FILE id="Ba2wdn" name="catch.hpp" compile="0" resource="0" file="Source/external/catch.hpp"/>
+        <FILE id="xvEnqV" name="csv.hpp" compile="0" resource="0" file="Source/external/csv.hpp"/>
+      </GROUP>
       <FILE id="IIR3ND" name="AppConfig.cpp" compile="1" resource="0" file="Source/AppConfig.cpp"/>
       <FILE id="EM7BL2" name="AppConfig.hpp" compile="0" resource="0" file="Source/AppConfig.hpp"/>
       <FILE id="nKlkyx" name="SBLookAndFeel.cpp" compile="1" resource="0"
             file="Source/SBLookAndFeel.cpp"/>
-      <FILE id="FvZ3VA" name="SBLookAndFeel.h" compile="0" resource="0" file="Source/SBLookAndFeel.h"/>
+      <FILE id="FvZ3VA" name="SBLookAndFeel.hpp" compile="0" resource="0"
+            file="Source/SBLookAndFeel.hpp"/>
       <FILE id="eJQSS0" name="HeadphoneConv.cpp" compile="1" resource="0"
             file="Source/HeadphoneConv.cpp"/>
-      <FILE id="ceYzZ8" name="HeadphoneConv.h" compile="0" resource="0" file="Source/HeadphoneConv.h"/>
+      <FILE id="ceYzZ8" name="HeadphoneConv.hpp" compile="0" resource="0"
+            file="Source/HeadphoneConv.hpp"/>
       <FILE id="qpD12d" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
-      <FILE id="rioAOF" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
+      <FILE id="rioAOF" name="MainComponent.hpp" compile="0" resource="0"
+            file="Source/MainComponent.hpp"/>
       <FILE id="GqpzpA" name="MainComponent.cpp" compile="1" resource="0"
             file="Source/MainComponent.cpp"/>
     </GROUP>

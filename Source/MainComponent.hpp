@@ -1,8 +1,8 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "SBLookAndFeel.h"
-#include "HeadphoneConv.h"
+#include "SBLookAndFeel.hpp"
+#include "HeadphoneConv.hpp"
 
 //==============================================================================
 /*

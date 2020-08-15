@@ -9,7 +9,7 @@
 */
 
 #include <JuceHeader.h>
-#include "SBLookAndFeel.h"
+#include "SBLookAndFeel.hpp"
 
 using namespace juce;
 

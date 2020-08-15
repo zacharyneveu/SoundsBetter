@@ -1,20 +1,23 @@
 /*
-  ==============================================================================
+ ==============================================================================
+ 
+ HeadphoneConv.cpp
+ Created: 25 Jul 2020 12:58:19pm
+ Author:  Zach Neveu
+ 
+ ==============================================================================
+ */
 
-    HeadphoneConv.cpp
-    Created: 25 Jul 2020 12:58:19pm
-    Author:  Zach Neveu
-
-  ==============================================================================
-*/
-
-#include "HeadphoneConv.h"
+#include "HeadphoneConv.hpp"
 #include "AppConfig.hpp"
+#include "external/csv.hpp"
 #include <JuceHeader.h>
+
+using namespace juce;
 
 //==============================================================================
 HeadphoneConv::HeadphoneConv()
-    : selector("Headphone Selector"), waveform(1, waveform_fmt_mgr, waveform_cache), waveform_cache(1)
+: selector("Headphone Selector"), waveform(1, waveform_fmt_mgr, waveform_cache), waveform_cache(1)
 {
     waveform_fmt_mgr.registerBasicFormats();
     waveform.addChangeListener(this);
@@ -32,8 +35,8 @@ HeadphoneConv::~HeadphoneConv() {}
 void HeadphoneConv::paint(juce::Graphics& g)
 {
     g.fillAll(getLookAndFeel().findColour(
-        juce::ResizableWindow::backgroundColourId)); // clear the background
-
+                                          juce::ResizableWindow::backgroundColourId)); // clear the background
+    
     g.setColour(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId).brighter());
     g.drawRoundedRectangle(waveform_bounds.toFloat(), 5.0, 1.0);
     
@@ -54,16 +57,30 @@ void HeadphoneConv::resized()
     selector.setBounds(bounds.removeFromTop(40));
     bounds.removeFromTop(waveform_padding);
     bounds.removeFromBottom(waveform_padding);
-   
+    
     waveform_bounds = bounds;
 }
 
 void HeadphoneConv::populateHeadphoneModels()
 {
+    File inf = File::getSpecialLocation(File::userHomeDirectory).getChildFile("ir_links.csv");
+    io::CSVReader<3> irs(inf.getFullPathName().toStdString());
+    irs.read_header(io::ignore_extra_column, "", "link", "stub");
+    std::string link, stub;
+    int idx;
+    while(irs.read_row(idx, link, stub))
+    {
+        String stb(stub);
+        String model = stb.fromLastOccurrenceOf("/", false, false);
+        hp_names[model] = model+".wav";
+        DBG("Loaded HPCF: "+model);
+    }
+    /*
     hp_names["None"] = "Other/None.wav";
     hp_names["HiFiMan"] = "HiFiMAN/HpCF_Massdrop_HiFiMAN_HE4XX.wav";
     hp_names["Bose"] = "Bose/HpCF_Bose_Noise_Cancelling_Headphones-700.wav";
     hp_names["Sennheiser"] = "Sennheiser/HpCF_Sennheiser_HD800S_A.wav";
+     */
 }
 
 StringArray HeadphoneConv::getHeadphoneNames()
@@ -86,25 +103,27 @@ void HeadphoneConv::comboBoxChanged(ComboBox* sel)
 File HeadphoneConv::downloadHPCF(std::string file_name)
 {
     File hpcf_dir = AppConfig::Instance().getHPCFDir();
-
-    File maker_dir = hpcf_dir.getChildFile(file_name.substr(0, file_name.find('/')));
+    
+    File maker_dir = hpcf_dir;
+    if(String(file_name).contains("/"))
+        maker_dir = maker_dir.getChildFile(file_name.substr(0, file_name.find('/')));
     maker_dir.createDirectory();
-
+    
     File hpcf = hpcf_dir.getChildFile(file_name);
     if (!hpcf.exists())
     {
         dl_progress = 0.0;
         AlertWindow win(
-            "Downloading Headphone Response...", "This shouldn't take long.", AlertWindow::NoIcon);
+                        "Downloading Headphone Response...", "This shouldn't take long.", AlertWindow::NoIcon);
         win.addButton("OK", 1, KeyPress(13));
         win.addProgressBarComponent(dl_progress);
-
+        
         URL url(AppConfig::Instance().getHPCFURL() + file_name);
         std::unique_ptr<URL::DownloadTask> dl_task =
-            url.downloadToFile(hpcf, "", (URL::DownloadTask::Listener*) this);
+        url.downloadToFile(hpcf, "", (URL::DownloadTask::Listener*) this);
         Logger::outputDebugString("Downloading file: " + url.toString(false));
         Logger::outputDebugString("Saving to: " + hpcf.getFullPathName());
-
+        
         win.runModalLoop();
     }
     return hpcf;
